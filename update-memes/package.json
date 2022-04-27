@@ -1,5 +1,5 @@
 {
-  "name": "get memes",
+  "name": "update memes",
   "version": "1.0.0",
   "description": "hello world sample for NodeJS",
   "main": "index.js",
@@ -8,7 +8,8 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.0.0",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "ethers": "^5.6.2"
   },
   "scripts": {
     "test": "mocha tests/unit/"
