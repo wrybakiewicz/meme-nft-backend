@@ -24,7 +24,7 @@ async function query (q) {
         try {
             res = await client.query(q)
         } catch (err) {
-            console.err("Error querying " + err)
+            console.error("Error querying " + err)
             throw err
         }
     } catch (e) {
@@ -75,7 +75,9 @@ function getIdsToSave(totalSupply, lastSavedId) {
 function fetchAndSave(id) {
     console.log("Fetching: " + id)
     return contract.tokenURI(id)
-        .then(url => console.log("ID: " + id + " url: " + url))
+        .then(url => {
+            return query(`INSERT INTO memes VALUES (${id}, '', '${url}', 0, 0, 0, false)`)
+        })
 }
 
 let response;
