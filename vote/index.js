@@ -13,8 +13,8 @@ async function query (q) {
     let client;
     try {
         client = await pool.connect()
-
     } catch (e) {
+        console.error("Error connecting to pool: " + e)
         throw e
     }
     let res
@@ -22,7 +22,7 @@ async function query (q) {
         try {
             res = await client.query(q)
         } catch (err) {
-            console.err(err)
+            console.error("Error querying " + err)
             throw err
         }
     } catch (e) {
@@ -32,19 +32,30 @@ async function query (q) {
     }
     return res
 }
+
 let response;
 
-//TODO: pagination
 exports.handler = async (event, context) => {
     try {
-        const { rows } = await query("select * from memes")
-        console.log(JSON.stringify(rows))
+        const body = event.body
+        const vote = body.vote
+
+        if(vote === 'up') {
+            console.log("Vote up")
+        } else if(vote === 'down') {
+            console.log("Vote down")
+        } else {
+            console.log("Invalid vote")
+        }
+
+        const signature = body.signature
+
         response = {
             'statusCode': 200,
             "headers": {
                 "Content-Type" : "application/json"
             },
-            "body": JSON.stringify(rows),
+            "body": "[]",
         }
         return response
     } catch (err) {
