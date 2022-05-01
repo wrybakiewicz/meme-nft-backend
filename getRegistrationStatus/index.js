@@ -50,7 +50,7 @@ exports.handler = async (event, context) => {
             "headers": {
                 "Content-Type" : "application/json"
             },
-            "body": {status: status},
+            "body": JSON.stringify({status: status}),
         }
         return response
     } catch (err) {

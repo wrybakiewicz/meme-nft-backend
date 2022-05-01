@@ -14,7 +14,8 @@ describe('Tests index', function () {
 
         expect(result).to.be.an('object');
         expect(result.statusCode).to.equal(200);
-        expect(result.body.status).to.equal('activated');
+        const response = JSON.parse(result.body);
+        expect(response.status).to.equal('activated');
     });
 
     it('verifies notRegistered', async () => {
@@ -25,6 +26,7 @@ describe('Tests index', function () {
 
         expect(result).to.be.an('object');
         expect(result.statusCode).to.equal(200);
-        expect(result.body.status).to.equal('notRegistered');
+        const response = JSON.parse(result.body);
+        expect(response.status).to.equal('notRegistered');
     });
 });
