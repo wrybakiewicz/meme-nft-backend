@@ -10,3 +10,14 @@ CREATE TABLE memes (
 
 INSERT INTO memes VALUES (1, 'test title', 'aBU62R_ZJ5NCNx4QppDcfg87G85WS-IrdBFS2ki2S88', 10, 1, 9, false);
 INSERT INTO memes VALUES (2, 'test title 2', 'pBlRaQbUB0zLyLzuigps_kC0EjojH_0ATBQqLI3-QEs', 5, 7, -2, false);
+
+
+CREATE TABLE vote_users(
+    address TEXT PRIMARY KEY,
+    email TEXT,
+    activation_code TEXT,
+    status TEXT
+);
+
+INSERT INTO vote_users(address, email, activation_code, status) VALUES ('address1', 'adam@wp.pl', '1234', 'activated');
+INSERT INTO vote_users(address, email, activation_code, status) VALUES ('address2', 'marek@wp.pl', '5678', 'email_sent');
