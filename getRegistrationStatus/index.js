@@ -36,7 +36,8 @@ let response;
 
 exports.handler = async (event, context) => {
     try {
-        const {address} = event.pathParameters
+        const address = event.pathParameters.address.toLowerCase()
+        console.log("Querying for: " + address)
         const { rows } = await query("SELECT status FROM vote_users WHERE address=$1", [address])
         let status
         if (rows.length > 0) {
@@ -48,7 +49,10 @@ exports.handler = async (event, context) => {
         response = {
             'statusCode': 200,
             "headers": {
-                "Content-Type" : "application/json"
+                "Content-Type" : "application/json",
+                "Access-Control-Allow-Headers" : "Content-Type",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,GET"
             },
             "body": JSON.stringify({status: status}),
         }

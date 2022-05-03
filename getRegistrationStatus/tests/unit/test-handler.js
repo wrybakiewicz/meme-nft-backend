@@ -8,7 +8,7 @@ var event, context;
 describe('Tests index', function () {
     it('verifies activated', async () => {
         event = {pathParameters: {
-                address: "address1"
+                address: "0x9B424f755831575446313cdE6A97eA5bc69B30A6"
             }}
         const result = await app.handler(event, context)
 

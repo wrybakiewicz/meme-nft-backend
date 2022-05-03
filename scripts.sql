@@ -20,4 +20,4 @@ CREATE TABLE vote_users(
 );
 
 INSERT INTO vote_users(address, email, activation_code, status) VALUES ('address1', 'adam@wp.pl', '1234', 'activated');
-INSERT INTO vote_users(address, email, activation_code, status) VALUES ('address2', 'marek@wp.pl', '5678', 'email_sent');
+INSERT INTO vote_users(address, email, activation_code, status) VALUES ('0x9b424f755831575446313cde6a97ea5bc69b30a6', 'marek@wp.pl', '5678', 'activated');
