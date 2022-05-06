@@ -9,6 +9,7 @@
   "dependencies": {
     "dotenv": "^16.0.0",
     "eth-sig-util": "^3.0.1",
+    "nodemailer": "^6.7.5",
     "pg": "^8.7.3"
   },
   "scripts": {

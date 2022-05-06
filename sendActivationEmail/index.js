@@ -1,6 +1,7 @@
 require("dotenv").config()
 const { Pool } = require('pg')
 const {recoverTypedSignature_v4 } = require('eth-sig-util');
+const nodemailer = require("nodemailer");
 
 var dbConfig = {
     user: process.env.DB_USERNAME,
@@ -9,6 +10,17 @@ var dbConfig = {
 };
 
 const pool = new Pool(dbConfig)
+
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASSWORD
+    },
+});
+
+transporter.verify().then(console.log).catch(console.error);
 
 async function query (query, value) {
     let client;
@@ -54,7 +66,19 @@ exports.handler = async (event, context) => {
         const code = Math.floor(Math.random()*90000000) + 10000000;
         console.log("Generated code: " + code + " for " + address)
         await query("INSERT INTO vote_users(address, email, activation_code, status) VALUES ($1, $2, $3, 'email_sent')", [address, email, code])
-        //TODO: send email
+
+        const sendEmailResult = await transporter.sendMail({
+            from: '"Meme NFT" <memenftss@gmail.com>', // sender address
+            to: "guziec96@gmail.com", // list of receivers
+            subject: "Test", // Subject line
+            html: "<b>This is <h1>test</h1></b>", // html body
+        }).then(info => {
+            console.log("Send email result: ")
+            console.log({info});
+        }).catch(console.error);
+
+        console.log(sendEmailResult)
+
         response = {
             'statusCode': 200,
             "headers": {
