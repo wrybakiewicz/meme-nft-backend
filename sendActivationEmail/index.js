@@ -1,5 +1,6 @@
 require("dotenv").config()
 const { Pool } = require('pg')
+const {recoverTypedSignature_v4 } = require('eth-sig-util');
 
 var dbConfig = {
     user: process.env.DB_USERNAME,
@@ -36,10 +37,15 @@ let response;
 
 exports.handler = async (event, context) => {
     try {
-        const body = JSON.parse(event.body)
-        const email = body.email
-        const address = body.address.toLowerCase()
-        //TODO: verify signature
+        const body = event.body
+        const signature = body.signature
+        const params = body.params
+        const email = params.message.email
+        const address = recoverTypedSignature_v4({
+            data: params,
+            sig: signature,
+        });
+        console.log(address)
         console.log("Sending mail to " + email + " for address : " + address)
         const { rows } = await query("SELECT status FROM vote_users WHERE address=$1", [address])
         if (rows.length > 0) {
