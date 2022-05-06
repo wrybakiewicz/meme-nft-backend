@@ -61,6 +61,11 @@ exports.handler = async (event, context) => {
         console.log("Sending mail to " + email + " for address : " + address)
         const { rows } = await query("SELECT status FROM vote_users WHERE address=$1", [address])
         if (rows.length > 0) {
+            console.log("FOUND existing email")
+            return;
+        }
+        if(!validateEmail(email)) {
+            console.log("Invalid email: " + email)
             return;
         }
         const code = Math.floor(Math.random()*90000000) + 10000000;
@@ -68,10 +73,10 @@ exports.handler = async (event, context) => {
         await query("INSERT INTO vote_users(address, email, activation_code, status) VALUES ($1, $2, $3, 'email_sent')", [address, email, code])
 
         const sendEmailResult = await transporter.sendMail({
-            from: '"Meme NFT" <memenftss@gmail.com>', // sender address
-            to: "guziec96@gmail.com", // list of receivers
-            subject: "Test", // Subject line
-            html: "<b>This is <h1>test</h1></b>", // html body
+            from: '"Meme NFT" <memenftss@gmail.com>',
+            to: email,
+            subject: "Activation code for MemeNFT",
+            html: `<div>Your activation code is <b>${code}</b></div>`
         }).then(info => {
             console.log("Send email result: ")
             console.log({info});
@@ -95,3 +100,10 @@ exports.handler = async (event, context) => {
         throw err;
     }
 };
+
+
+function validateEmail(email)
+{
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+}
