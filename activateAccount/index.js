@@ -49,16 +49,20 @@ exports.handler = async (event, context) => {
         }
         const realActivationCode = rows[0].activation_code
 
-        if(realActivationCode === activationCode.toString()) {
+        if(realActivationCode.toString() === activationCode.toString()) {
             console.log("Activating: " + email)
             await query("UPDATE vote_users SET status = 'activated' WHERE email=$1 AND status != 'activated'", [email])
+        } else {
+            console.log("Not activated")
+            console.log(realActivationCode.toString())
+            console.log(activationCode.toString())
         }
 
         response = {
-            'statusCode': 200,
+            "statusCode": 200,
             "headers": {
                 "Content-Type" : "application/json",
-                "Access-Control-Allow-Headers" : "Content-Type",
+                "Access-Control-Allow-Headers" : "*",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "OPTIONS,GET,POST"
             },
