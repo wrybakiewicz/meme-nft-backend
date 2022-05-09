@@ -49,9 +49,11 @@ let response;
 
 exports.handler = async (event, context) => {
     try {
-        const body = event.body
+        console.log("Received request")
+        console.log(event)
+        const body = JSON.parse(event.body)
         const signature = body.signature
-        const params = body.params
+        const params = JSON.parse(body.params)
         const email = params.message.email
         const address = recoverTypedSignature_v4({
             data: params,
@@ -90,7 +92,7 @@ exports.handler = async (event, context) => {
                 "Content-Type" : "application/json",
                 "Access-Control-Allow-Headers" : "Content-Type",
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "OPTIONS,GET"
+                "Access-Control-Allow-Methods": "OPTIONS,GET,POST"
             },
             "body": JSON.stringify({status: "OK"}),
         }
