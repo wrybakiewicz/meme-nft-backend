@@ -9,7 +9,7 @@ describe('Tests index', function () {
     it('send email', async () => {
         event = {
             body:
-                '{"signature":"0x9910784859ad1a45cd83e921ec07692cdd550544089fa7cd980117a2570190861ae925837c698921beb6d2dd6f63484ef9894c252a702ca898a85b1ffd60b1c71c","params":"{\\"domain\\":{\\"chainId\\":80001,\\"name\\":\\"Meme NFT\\",\\"verifyingContract\\":\\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\\",\\"version\\":\\"1\\"},\\"message\\":{\\"email\\":\\"guziec96@gmail.com\\"},\\"primaryType\\":\\"Mail\\",\\"types\\":{\\"Mail\\":[{\\"name\\":\\"email\\",\\"type\\":\\"string\\"}]}}"}'
+                '{"email": "guziec96@gmail.com", "activationCode": 22584453}'
         }
         const result = await app.handler(event, context)
 
