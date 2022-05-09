@@ -8,9 +8,9 @@ var event, context;
 describe('Tests index', function () {
     it('send email', async () => {
         event = {
-            body:
-                '{"email": "guziec96@gmail.com", "activationCode": 22584453}'
+            "email": "guziec96@gmail.com", "activationCode": '57063049'
         }
+
         const result = await app.handler(event, context)
 
         expect(result).to.be.an('object');

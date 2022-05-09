@@ -38,9 +38,8 @@ exports.handler = async (event, context) => {
     try {
         console.log("Activating account")
         console.log(event)
-        const body = JSON.parse(event.body)
-        const email = body.email
-        const activationCode = body.activationCode
+        const email = event.email
+        const activationCode = event.activationCode
         console.log("Activating: " + email + " with code : " + activationCode)
 
         const { rows } = await query("SELECT activation_code FROM vote_users WHERE email=$1 AND status != 'activated'", [email])
