@@ -1,5 +1,6 @@
 require("dotenv").config()
-const { Pool } = require('pg')
+const {Pool} = require('pg')
+const {rows} = require("pg/lib/defaults");
 
 var dbConfig = {
     user: process.env.DB_USERNAME,
@@ -9,7 +10,7 @@ var dbConfig = {
 
 const pool = new Pool(dbConfig)
 
-async function query (q) {
+async function query(query, value) {
     let client;
     try {
         client = await pool.connect()
@@ -20,9 +21,9 @@ async function query (q) {
     let res
     try {
         try {
-            res = await client.query(q)
+            res = await client.query(query, value)
         } catch (err) {
-            console.err(err)
+            console.error(err)
             throw err
         }
     } catch (e) {
@@ -32,19 +33,40 @@ async function query (q) {
     }
     return res
 }
+
 let response;
 
-//TODO: pagination
 exports.handler = async (event, context) => {
     try {
-        const { rows } = await query("select * from memes")
-        console.log(JSON.stringify(rows))
+        const queryParams = event.queryStringParameters
+        const itemsPerPage = queryParams.itemsPerPage
+        const pagesSkip = queryParams.pagesSkip
+        console.log("Querying: " + itemsPerPage + " skip: " + pagesSkip)
+        const queryString = `
+            SELECT id, title, link, vote_up_count, vote_down_count
+            FROM memes
+            WHERE is_blocked = false
+            ORDER BY vote_result DESC 
+            LIMIT $1
+            OFFSET $2
+        `
+        const rowsMemesPromise = query(queryString, [itemsPerPage, pagesSkip * itemsPerPage])
+        const totalMemesPromise = query('SELECT COUNT(*) FROM memes WHERE is_blocked = false')
+
+        const rowsMemes = (await rowsMemesPromise).rows
+        const total = (await totalMemesPromise).rows[0].count
+        console.log(JSON.stringify(rowsMemes))
+        console.log(total)
+        const totalPages = Math.ceil((1.0 * total) / itemsPerPage)
         response = {
             'statusCode': 200,
             "headers": {
-                "Content-Type" : "application/json"
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,GET"
             },
-            "body": JSON.stringify(rows),
+            "body": JSON.stringify({memes: rowsMemes, totalPages: totalPages}),
         }
         return response
     } catch (err) {
