@@ -38,6 +38,7 @@ let response;
 
 exports.handler = async (event, context) => {
     try {
+        console.log(event)
         const queryParams = event.queryStringParameters
         const itemsPerPage = queryParams.itemsPerPage
         const pagesSkip = queryParams.pagesSkip
