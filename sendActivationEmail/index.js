@@ -22,29 +22,31 @@ const transporter = nodemailer.createTransport({
 
 transporter.verify().then(console.log).catch(console.error);
 
-async function query (query, value) {
-    let client;
-    try {
-        client = await pool.connect()
+let client;
 
-    } catch (e) {
-        throw e
+async function query(query, value) {
+    if(client === undefined) {
+        await initializeDbClient()
     }
     let res
     try {
-        try {
-            res = await client.query(query, value)
-        } catch (err) {
-            console.error(err)
-            throw err
-        }
+        res = await client.query(query, value)
     } catch (e) {
+        console.log("Error querying")
         throw e
-    } finally {
-        client.end()
     }
     return res
 }
+
+const initializeDbClient = async () => {
+    try {
+        client = await pool.connect()
+    } catch (e) {
+        console.log("Error initializing client")
+        throw e
+    }
+}
+
 let response;
 
 exports.handler = async (event, context) => {

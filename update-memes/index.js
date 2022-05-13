@@ -11,32 +11,34 @@ var dbConfig = {
 
 const pool = new Pool(dbConfig)
 
-async function query (q) {
-    let client;
-    try {
-        client = await pool.connect()
-    } catch (e) {
-        console.error("Error connecting to pool: " + e)
-        throw e
+let client;
+
+async function query(query, value) {
+    if(client === undefined) {
+        await initializeDbClient()
     }
     let res
     try {
-        try {
-            res = await client.query(q)
-        } catch (err) {
-            console.error("Error querying " + err)
-            throw err
-        }
+        res = await client.query(query, value)
     } catch (e) {
+        console.log("Error querying")
         throw e
-    } finally {
-        client.end()
     }
     return res
 }
 
+const initializeDbClient = async () => {
+    try {
+        client = await pool.connect()
+    } catch (e) {
+        console.log("Error initializing client")
+        throw e
+    }
+}
+
+
 function getContract() {
-    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/" + process.env.RPC_KEY);
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/" + process.env.RPC_KEY);
     return new ethers.Contract(
         deploy.contracts.MemeNFTOpen.address,
         deploy.contracts.MemeNFTOpen.abi,
