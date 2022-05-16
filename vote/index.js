@@ -1,5 +1,6 @@
 require("dotenv").config()
 const { Pool } = require('pg')
+const {recoverTypedSignature_v4 } = require('eth-sig-util');
 
 var dbConfig = {
     user: process.env.DB_USERNAME,
@@ -9,46 +10,59 @@ var dbConfig = {
 
 const pool = new Pool(dbConfig)
 
-async function query (q) {
-    let client;
-    try {
-        client = await pool.connect()
-    } catch (e) {
-        console.error("Error connecting to pool: " + e)
-        throw e
+let client;
+
+async function query(query, value) {
+    if(client === undefined) {
+        await initializeDbClient()
     }
     let res
     try {
-        try {
-            res = await client.query(q)
-        } catch (err) {
-            console.error("Error querying " + err)
-            throw err
-        }
+        res = await client.query(query, value)
     } catch (e) {
+        console.log("Error querying")
         throw e
-    } finally {
-        client.end()
     }
     return res
 }
+
+const initializeDbClient = async () => {
+    try {
+        client = await pool.connect()
+    } catch (e) {
+        console.log("Error initializing client")
+        throw e
+    }
+}
+
 
 let response;
 
 exports.handler = async (event, context) => {
     try {
-        const body = event.body
-        const vote = body.vote
+        console.log("Received request")
+        console.log(event)
+        const body = JSON.parse(event.body)
+        const signature = body.signature
+        const params = JSON.parse(body.params)
+        const vote = params.message.vote
+        const memeId = params.message.memeId
+        const address = recoverTypedSignature_v4({
+            data: params,
+            sig: signature,
+        });
 
-        if(vote === 'up') {
+        console.log(address)
+        console.log(vote)
+        console.log(memeId)
+
+        if(vote === 'UP') {
             console.log("Vote up")
-        } else if(vote === 'down') {
+        } else if(vote === 'DOWN') {
             console.log("Vote down")
         } else {
             console.log("Invalid vote")
         }
-
-        const signature = body.signature
 
         response = {
             'statusCode': 200,
