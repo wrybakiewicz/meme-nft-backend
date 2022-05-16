@@ -32,4 +32,5 @@ CREATE TABLE votes(
 
 INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ('address1', 1, true, false);
 INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ('0x9b424f755831575446313cde6a97ea5bc69b30a6', 1, true, false);
+INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ('0x26ea8aaf2028ecb261e36b61e6a21b03bd229c77', 1, false, true);
 INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ('address1', 2, false, true);

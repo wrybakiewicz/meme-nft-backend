@@ -96,6 +96,18 @@ exports.handler = async (event, context) => {
             console.log("Invalid vote")
         }
 
+        if(result === "OK") {
+            const upVoteCountPromise = query(`SELECT COUNT(*) FROM votes WHERE meme_id = $1 AND vote_up = true`, [memeId])
+            const downVoteCountPromise = query(`SELECT COUNT(*) FROM votes WHERE meme_id = $1 AND vote_down = true`, [memeId])
+            const upVoteCount = (await upVoteCountPromise).rows[0].count
+            const downVoteCount = (await downVoteCountPromise).rows[0].count
+            const result = upVoteCount - downVoteCount
+            console.log(upVoteCount)
+            console.log(downVoteCount)
+            console.log(result)
+            await query(`UPDATE memes SET vote_up_count = $1, vote_down_count = $2, vote_result = $3 WHERE id = $4`, [upVoteCount, downVoteCount, result, memeId])
+        }
+
         response = {
             'statusCode': 200,
             "headers": {
