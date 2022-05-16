@@ -21,3 +21,15 @@ CREATE TABLE vote_users(
 
 INSERT INTO vote_users(address, email, activation_code, status) VALUES ('address1', 'adam@wp.pl', '1234', 'activated');
 INSERT INTO vote_users(address, email, activation_code, status) VALUES ('0x9b424f755831575446313cde6a97ea5bc69b30a6', 'marek@wp.pl', '5678', 'activated');
+
+
+CREATE TABLE votes(
+                           address TEXT,
+                           meme_id int,
+                           vote_up boolean,
+                           vote_down boolean
+);
+
+INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ('address1', 1, true, false);
+INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ('0x9b424f755831575446313cde6a97ea5bc69b30a6', 1, true, false);
+INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ('address1', 2, false, true);

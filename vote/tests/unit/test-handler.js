@@ -18,7 +18,7 @@ describe('Tests index', function () {
 
         let response = JSON.parse(result.body);
 
-        expect(response).to.be.an('array');
+        expect(response.result).to.be.equal('OK');
     });
     it('verifies DOWN successful response', async () => {
         event = {
@@ -32,6 +32,6 @@ describe('Tests index', function () {
 
         let response = JSON.parse(result.body);
 
-        expect(response).to.be.an('array');
+        expect(response.result).to.be.equal('OK');
     });
 });

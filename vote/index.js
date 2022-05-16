@@ -56,10 +56,42 @@ exports.handler = async (event, context) => {
         console.log(vote)
         console.log(memeId)
 
-        if(vote === 'UP') {
-            console.log("Vote up")
-        } else if(vote === 'DOWN') {
-            console.log("Vote down")
+        let result = "INVALID";
+
+        if(vote === 'UP' || vote === 'DOWN') {
+            console.log("Vote: " + vote)
+            const isUserActive = await query(`SELECT address FROM vote_users WHERE status = 'activated' AND address =$1`, [address])
+            console.log("Users found: " + isUserActive.rows.length)
+            if(isUserActive.rows.length > 0) {
+                const isUserVoted = await query(`SELECT address FROM votes WHERE address = $1 AND meme_id = $2`, [address, memeId])
+                console.log("User voted: " + isUserVoted.rows.length)
+                if(isUserVoted.rows.length) {
+                    result = "OK"
+                    const updateQuery = `UPDATE votes SET vote_up = $1, vote_down=$2 WHERE address = $3 AND meme_id = $4`
+                    if(vote === 'UP') {
+                        console.log("UPDATE UP")
+                        await query(updateQuery, [true, false, address, memeId])
+                    } else {
+                        console.log("UPDATE DOWN")
+                        await query(updateQuery, [false, true, address, memeId])
+                    }
+                } else {
+                    result = "OK"
+                    const insertQuery = "INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ($1, $2, $3, $4)"
+                    let voteUp = false
+                    let voteDown = false
+                    if(vote === 'UP') {
+                        console.log("INSERT UP")
+                        voteUp = true
+                    } else {
+                        console.log("INSERT DOWN")
+                        voteDown = true
+                    }
+                    await query(insertQuery, [address, memeId, voteUp, voteDown])
+                }
+            } else {
+                console.log("User not active")
+            }
         } else {
             console.log("Invalid vote")
         }
@@ -69,7 +101,7 @@ exports.handler = async (event, context) => {
             "headers": {
                 "Content-Type" : "application/json"
             },
-            "body": "[]",
+            "body": JSON.stringify({result: result}),
         }
         return response
     } catch (err) {
