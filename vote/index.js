@@ -38,6 +38,7 @@ const initializeDbClient = async () => {
 
 let response;
 
+//TODO: check if meme has competition which have not ended
 exports.handler = async (event, context) => {
     try {
         console.log("Received request")

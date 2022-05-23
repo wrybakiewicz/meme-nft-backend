@@ -37,6 +37,8 @@ const initializeDbClient = async () => {
 
 let response;
 
+//TODO: query by competition
+//TODO: add lambda to list all competitions
 exports.handler = async (event, context) => {
     try {
         console.log(event)

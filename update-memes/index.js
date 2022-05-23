@@ -86,6 +86,10 @@ let response;
 
 const contract = getContract()
 
+//TODO: query competitions table (check if there is competition which is not finished yet
+//TODO: if there is no competition create one (with increased number)
+//TODO: assign memes to competition
+
 exports.handler = async (event, context) => {
     try {
         const totalSupplyPromise = getTotalSupply()
