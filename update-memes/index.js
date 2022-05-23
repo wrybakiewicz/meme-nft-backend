@@ -82,11 +82,22 @@ function fetchAndSave(id) {
         })
 }
 
+function getActiveCompetitionId() {
+    return query("SELECT id from competitions WHERE now() > startdate AND now() < enddate").then(_ => {
+        console.log(_.rows);
+        if(_.rows.length == 0) {
+            return undefined
+        } else {
+            return _.rows[0].id
+        }
+    })
+
+}
+
 let response;
 
 const contract = getContract()
 
-//TODO: query competitions table (check if there is competition which is not finished yet
 //TODO: if there is no competition create one (with increased number)
 //TODO: assign memes to competition
 
@@ -94,9 +105,12 @@ exports.handler = async (event, context) => {
     try {
         const totalSupplyPromise = getTotalSupply()
         const lastSavedIdPromise = getLastSavedId()
+        const activeCompetitionIdPromise = getActiveCompetitionId()
 
         const totalSupply = await totalSupplyPromise
         const lastSavedId = await lastSavedIdPromise
+        const activeCompetitionId = await activeCompetitionIdPromise
+        console.log(activeCompetitionId)
 
         if(totalSupply > lastSavedId) {
             console.log("Updating memes in DB")
