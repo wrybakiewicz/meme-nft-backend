@@ -37,23 +37,25 @@ const initializeDbClient = async () => {
 
 let response;
 
-//TODO: query by competition
 exports.handler = async (event, context) => {
     try {
         console.log(event)
         const queryParams = event.queryStringParameters
         const itemsPerPage = queryParams.itemsPerPage
         const pagesSkip = queryParams.pagesSkip
-        console.log("Querying: " + itemsPerPage + " skip: " + pagesSkip)
+        const competition = queryParams.competition
+        console.log("Querying: " + itemsPerPage + " skip: " + pagesSkip + " competition: " + competition)
+
         const queryString = `
             SELECT id, title, link, vote_up_count, vote_down_count
             FROM memes
             WHERE is_blocked = false
+            AND competition_id = $3
             ORDER BY vote_result DESC 
             LIMIT $1
             OFFSET $2
         `
-        const rowsMemesPromise = query(queryString, [itemsPerPage, pagesSkip * itemsPerPage])
+        const rowsMemesPromise = query(queryString, [itemsPerPage, pagesSkip * itemsPerPage, competition])
         const totalMemesPromise = query('SELECT COUNT(*) FROM memes WHERE is_blocked = false')
 
         const rowsMemes = (await rowsMemesPromise).rows

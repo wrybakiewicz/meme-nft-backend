@@ -10,7 +10,8 @@ describe('Tests index', function () {
         event = {
             queryStringParameters: {
                 itemsPerPage: 2,
-                pagesSkip: 1
+                pagesSkip: 1,
+                competition: 5
             }
         }
         const result = await app.handler(event, context)
