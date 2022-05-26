@@ -74,11 +74,11 @@ function getIdsToSave(totalSupply, lastSavedId) {
     return result
 }
 
-function fetchAndSave(id) {
+function fetchAndSave(id, competitionId) {
     console.log("Fetching: " + id)
     return contract.tokenURI(id)
         .then(url => {
-            return query(`INSERT INTO memes VALUES (${id}, '', '${url}', 0, 0, 0, false)`)
+            return query(`INSERT INTO memes VALUES (${id}, '', '${url}', 0, 0, 0, false, ${competitionId})`)
         })
 }
 
@@ -86,20 +86,16 @@ function getActiveCompetitionId() {
     return query("SELECT id from competitions WHERE now() > startdate AND now() < enddate").then(_ => {
         console.log(_.rows);
         if(_.rows.length == 0) {
-            return undefined
+            return ''
         } else {
             return _.rows[0].id
         }
     })
-
 }
 
 let response;
 
 const contract = getContract()
-
-//TODO: if there is no competition create one (with increased number)
-//TODO: assign memes to competition
 
 exports.handler = async (event, context) => {
     try {
@@ -109,14 +105,14 @@ exports.handler = async (event, context) => {
 
         const totalSupply = await totalSupplyPromise
         const lastSavedId = await lastSavedIdPromise
-        const activeCompetitionId = await activeCompetitionIdPromise
-        console.log(activeCompetitionId)
+        let competitionId = await activeCompetitionIdPromise
+        console.log(competitionId)
 
         if(totalSupply > lastSavedId) {
             console.log("Updating memes in DB")
             const idsToFetch = getIdsToSave(totalSupply, lastSavedId)
             console.log("IDs to fetch: " + idsToFetch)
-            await Promise.all(idsToFetch.map(id => fetchAndSave(id)))
+            await Promise.all(idsToFetch.map(id => fetchAndSave(id, competitionId)))
         } else {
             console.log("No need to update memes in DB")
         }
