@@ -1,6 +1,6 @@
 require("dotenv").config()
-const { Pool } = require('pg')
-const {recoverTypedSignature_v4 } = require('eth-sig-util');
+const {Pool} = require('pg')
+const {recoverTypedSignature_v4} = require('eth-sig-util');
 
 var dbConfig = {
     user: process.env.DB_USERNAME,
@@ -13,7 +13,7 @@ const pool = new Pool(dbConfig)
 let client;
 
 async function query(query, value) {
-    if(client === undefined) {
+    if (client === undefined) {
         await initializeDbClient()
     }
     let res
@@ -35,10 +35,21 @@ const initializeDbClient = async () => {
     }
 }
 
+function isCompetitionActive(memeId) {
+    return query("SELECT COUNT(*) FROM competitions WHERE id = (SELECT competition_id FROM memes WHERE id = $1) AND now() > startdate AND now() < enddate", [memeId]).then(_ => {
+        console.log("Is competition active")
+        console.log(_.rows)
+        console.log(_.rows[0].count);
+        if (_.rows[0].count === '0') {
+            return false
+        } else {
+            return true
+        }
+    })
+}
 
 let response;
 
-//TODO: check if meme has competition which have not ended
 exports.handler = async (event, context) => {
     try {
         console.log("Received request")
@@ -59,36 +70,54 @@ exports.handler = async (event, context) => {
 
         let result = "INVALID";
 
-        if(vote === 'UP' || vote === 'DOWN') {
+        if (vote === 'UP' || vote === 'DOWN') {
             console.log("Vote: " + vote)
-            const isUserActive = await query(`SELECT address FROM vote_users WHERE status = 'activated' AND address =$1`, [address])
+            const isUserActivePromise = query(`SELECT address
+                                               FROM vote_users
+                                               WHERE status = 'activated'
+                                                 AND address = $1`, [address])
+            const isCompetitionActivePromise = isCompetitionActive(memeId)
+            const isUserActive = await isUserActivePromise
+            const isCompetitionActiveResult = await isCompetitionActivePromise
             console.log("Users found: " + isUserActive.rows.length)
-            if(isUserActive.rows.length > 0) {
-                const isUserVoted = await query(`SELECT address FROM votes WHERE address = $1 AND meme_id = $2`, [address, memeId])
-                console.log("User voted: " + isUserVoted.rows.length)
-                if(isUserVoted.rows.length) {
-                    result = "OK"
-                    const updateQuery = `UPDATE votes SET vote_up = $1, vote_down=$2 WHERE address = $3 AND meme_id = $4`
-                    if(vote === 'UP') {
-                        console.log("UPDATE UP")
-                        await query(updateQuery, [true, false, address, memeId])
+            console.log("Is competition active: " + isCompetitionActiveResult)
+            if (isUserActive.rows.length > 0) {
+                if (isCompetitionActiveResult) {
+                    const isUserVoted = await query(`SELECT address
+                                                     FROM votes
+                                                     WHERE address = $1
+                                                       AND meme_id = $2`, [address, memeId])
+                    console.log("User voted: " + isUserVoted.rows.length)
+                    if (isUserVoted.rows.length) {
+                        result = "OK"
+                        const updateQuery = `UPDATE votes
+                                             SET vote_up  = $1,
+                                                 vote_down=$2
+                                             WHERE address = $3
+                                               AND meme_id = $4`
+                        if (vote === 'UP') {
+                            console.log("UPDATE UP")
+                            await query(updateQuery, [true, false, address, memeId])
+                        } else {
+                            console.log("UPDATE DOWN")
+                            await query(updateQuery, [false, true, address, memeId])
+                        }
                     } else {
-                        console.log("UPDATE DOWN")
-                        await query(updateQuery, [false, true, address, memeId])
+                        result = "OK"
+                        const insertQuery = "INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ($1, $2, $3, $4)"
+                        let voteUp = false
+                        let voteDown = false
+                        if (vote === 'UP') {
+                            console.log("INSERT UP")
+                            voteUp = true
+                        } else {
+                            console.log("INSERT DOWN")
+                            voteDown = true
+                        }
+                        await query(insertQuery, [address, memeId, voteUp, voteDown])
                     }
                 } else {
-                    result = "OK"
-                    const insertQuery = "INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ($1, $2, $3, $4)"
-                    let voteUp = false
-                    let voteDown = false
-                    if(vote === 'UP') {
-                        console.log("INSERT UP")
-                        voteUp = true
-                    } else {
-                        console.log("INSERT DOWN")
-                        voteDown = true
-                    }
-                    await query(insertQuery, [address, memeId, voteUp, voteDown])
+                    console.log("No active competition")
                 }
             } else {
                 console.log("User not active")
@@ -97,23 +126,33 @@ exports.handler = async (event, context) => {
             console.log("Invalid vote")
         }
 
-        if(result === "OK") {
-            const upVoteCountPromise = query(`SELECT COUNT(*) FROM votes WHERE meme_id = $1 AND vote_up = true`, [memeId])
-            const downVoteCountPromise = query(`SELECT COUNT(*) FROM votes WHERE meme_id = $1 AND vote_down = true`, [memeId])
+        if (result === "OK") {
+            const upVoteCountPromise = query(`SELECT COUNT(*)
+                                              FROM votes
+                                              WHERE meme_id = $1
+                                                AND vote_up = true`, [memeId])
+            const downVoteCountPromise = query(`SELECT COUNT(*)
+                                                FROM votes
+                                                WHERE meme_id = $1
+                                                  AND vote_down = true`, [memeId])
             const upVoteCount = (await upVoteCountPromise).rows[0].count
             const downVoteCount = (await downVoteCountPromise).rows[0].count
             const result = upVoteCount - downVoteCount
             console.log(upVoteCount)
             console.log(downVoteCount)
             console.log(result)
-            await query(`UPDATE memes SET vote_up_count = $1, vote_down_count = $2, vote_result = $3 WHERE id = $4`, [upVoteCount, downVoteCount, result, memeId])
+            await query(`UPDATE memes
+                         SET vote_up_count   = $1,
+                             vote_down_count = $2,
+                             vote_result     = $3
+                         WHERE id = $4`, [upVoteCount, downVoteCount, result, memeId])
         }
 
         response = {
             'statusCode': 200,
             "headers": {
-                "Content-Type" : "application/json",
-                "Access-Control-Allow-Headers" : "Content-Type",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Headers": "Content-Type",
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "OPTIONS,GET,POST"
             },
