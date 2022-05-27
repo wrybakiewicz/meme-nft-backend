@@ -39,7 +39,7 @@ let response;
 exports.handler = async (event, context) => {
     try {
         console.log("Querying competitions")
-        const { rows } = await query("SELECT id, startDate, endDate FROM competitions")
+        const { rows } = await query("SELECT id, name, startDate, endDate FROM competitions")
         console.log(JSON.stringify(rows))
         response = {
             'statusCode': 200,

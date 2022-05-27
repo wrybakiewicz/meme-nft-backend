@@ -38,9 +38,10 @@ INSERT INTO votes(address, meme_id, vote_up, vote_down) VALUES ('address1', 2, f
 
 CREATE TABLE competitions(
     id SERIAL PRIMARY KEY,
+    name TEXT,
     startDate TIMESTAMP,
     endDate TIMESTAMP
 );
 
-INSERT INTO competitions(startDate, endDate) VALUES (TO_TIMESTAMP('2022-05-23', 'YYYY-MM-DD'), TO_TIMESTAMP('2022-05-29', 'YYYY-MM-DD'));
-INSERT INTO competitions(startDate, endDate) VALUES (TO_TIMESTAMP('2022-05-16', 'YYYY-MM-DD'), TO_TIMESTAMP('2022-05-23', 'YYYY-MM-DD'));
+INSERT INTO competitions(name, startDate, endDate) VALUES ('Competition 1', TO_TIMESTAMP('2022-05-23', 'YYYY-MM-DD'), TO_TIMESTAMP('2022-05-29', 'YYYY-MM-DD'));
+INSERT INTO competitions(name, startDate, endDate) VALUES ('Competition 2', TO_TIMESTAMP('2022-05-16', 'YYYY-MM-DD'), TO_TIMESTAMP('2022-05-23', 'YYYY-MM-DD'));
