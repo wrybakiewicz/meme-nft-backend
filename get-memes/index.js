@@ -44,7 +44,8 @@ exports.handler = async (event, context) => {
         const itemsPerPage = queryParams.itemsPerPage
         const pagesSkip = queryParams.pagesSkip
         const competition = queryParams.competition
-        console.log("Querying: " + itemsPerPage + " skip: " + pagesSkip + " competition: " + competition)
+        const address = queryParams.address
+        console.log("Querying: " + itemsPerPage + " skip: " + pagesSkip + " competition: " + competition + " address: " + address)
 
         const queryString = `
             SELECT id, title, link, vote_up_count, vote_down_count
@@ -60,7 +61,26 @@ exports.handler = async (event, context) => {
 
         const rowsMemes = (await rowsMemesPromise).rows
         const total = (await totalMemesPromise).rows[0].count
-        console.log(JSON.stringify(rowsMemes))
+
+        let memes = rowsMemes
+        if(address) {
+            console.log("Querying votes for address: " + address)
+            const memeIds = rowsMemes.map(_ => _.id).join(",")
+            console.log(memeIds)
+            const queryString = `SELECT meme_id, vote_up, vote_down FROM votes WHERE address = $1 AND meme_id IN (${memeIds})`
+            const votes = (await query(queryString, [address])).rows
+            console.log(votes)
+            memes = rowsMemes.map(meme => {
+                const vote = votes.filter(vote => vote.meme_id === meme.id)
+                if(vote.length > 0) {
+                    meme["votedUp"] = vote[0].vote_up
+                    meme["votedDown"] = vote[0].vote_down
+                }
+                return meme
+            })
+        }
+
+        console.log(JSON.stringify(memes))
         console.log(total)
         const totalPages = Math.ceil((1.0 * total) / itemsPerPage)
         response = {
@@ -71,7 +91,7 @@ exports.handler = async (event, context) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "OPTIONS,GET"
             },
-            "body": JSON.stringify({memes: rowsMemes, totalPages: totalPages}),
+            "body": JSON.stringify({memes: memes, totalPages: totalPages}),
         }
         return response
     } catch (err) {
