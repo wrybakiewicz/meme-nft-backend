@@ -56,7 +56,7 @@ exports.handler = async (event, context) => {
             OFFSET $2
         `
         const rowsMemesPromise = query(queryString, [itemsPerPage, pagesSkip * itemsPerPage, competition])
-        const totalMemesPromise = query('SELECT COUNT(*) FROM memes WHERE is_blocked = false')
+        const totalMemesPromise = query('SELECT COUNT(*) FROM memes WHERE is_blocked = false AND competition_id = $1', [competition])
 
         const rowsMemes = (await rowsMemesPromise).rows
         const total = (await totalMemesPromise).rows[0].count
