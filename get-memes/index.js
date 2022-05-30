@@ -63,7 +63,7 @@ exports.handler = async (event, context) => {
         const total = (await totalMemesPromise).rows[0].count
 
         let memes = rowsMemes
-        if(address) {
+        if(address && rowsMemes.length > 0) {
             console.log("Querying votes for address: " + address)
             const memeIds = rowsMemes.map(_ => _.id).join(",")
             console.log(memeIds)

@@ -10,8 +10,8 @@ describe('Tests index', function () {
         event = {
             queryStringParameters: {
                 itemsPerPage: 2,
-                pagesSkip: 1,
-                competition: 1,
+                pagesSkip: 0,
+                competition: 2,
                 address: '0x26ea8aaf2028ecb261e36b61e6a21b03bd229c77'
             }
         }
