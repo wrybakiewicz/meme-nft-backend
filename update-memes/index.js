@@ -78,7 +78,7 @@ function fetchAndSave(id, competitionId) {
     console.log("Fetching: " + id)
     return contract.tokenURI(id)
         .then(url => {
-            return query(`INSERT INTO memes VALUES (${id}, '', '${url}', 0, 0, 0, false, ${competitionId})`)
+            return query(`INSERT INTO memes VALUES (${id}, '', '${url}', 0, 0, 0, false, ${competitionId}, false)`)
         })
 }
 

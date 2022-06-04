@@ -41,11 +41,8 @@ exports.handler = async (event, context) => {
     try {
         console.log(event)
         const queryParams = event.queryStringParameters
-        const itemsPerPage = queryParams.itemsPerPage
-        const pagesSkip = queryParams.pagesSkip
-        const competition = queryParams.competition
         const address = queryParams.address
-        console.log("Querying: " + itemsPerPage + " skip: " + pagesSkip + " competition: " + competition + " address: " + address)
+        console.log("Querying for address: " + address)
 
         const queryString = `
             SELECT id, title, link, vote_up_count, vote_down_count, is_winner
@@ -53,7 +50,6 @@ exports.handler = async (event, context) => {
             WHERE is_blocked = false
             AND competition_id = $3
             ORDER BY vote_result DESC 
-            LIMIT $1
             OFFSET $2
         `
         const rowsMemesPromise = query(queryString, [itemsPerPage, pagesSkip * itemsPerPage, competition])
