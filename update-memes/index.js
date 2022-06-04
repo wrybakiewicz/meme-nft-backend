@@ -78,7 +78,7 @@ function fetchAndSave(id, competitionId) {
     console.log("Fetching: " + id)
     return contract.tokenURI(id)
         .then(url => {
-            return query(`INSERT INTO memes VALUES (${id}, '', '${url}', 0, 0, 0, false, ${competitionId}, false)`)
+            return query(`INSERT INTO memes VALUES (${id}, '', '${url}', 0, 0, 0, false, ${competitionId}, false, '')`)
         })
 }
 
@@ -89,6 +89,23 @@ function getActiveCompetitionId() {
             return ''
         } else {
             return _.rows[0].id
+        }
+    })
+}
+
+async function updateOwners() {
+    return query("SELECT id, owner_address FROM memes").then(_ => {
+        const idOwnerAddresses = _.rows
+        console.log(idOwnerAddresses)
+        const updateOwnerPromiseList = idOwnerAddresses.map(_ => updateOwner(_.id, _.owner_address))
+        return Promise.all(updateOwnerPromiseList)
+    })
+}
+
+function updateOwner(id, ownerAddressInDb) {
+    return contract.ownerOf(id).then(async owner => {
+        if (owner !== ownerAddressInDb) {
+            return query("UPDATE memes SET owner_address =$1 WHERE id = $2", [owner, id])
         }
     })
 }
@@ -116,6 +133,8 @@ exports.handler = async (event, context) => {
         } else {
             console.log("No need to update memes in DB")
         }
+
+        await updateOwners()
 
         response = {
             'statusCode': 200,
