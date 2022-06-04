@@ -103,9 +103,10 @@ async function updateOwners() {
 }
 
 function updateOwner(id, ownerAddressInDb) {
-    return contract.ownerOf(id).then(async owner => {
-        if (owner !== ownerAddressInDb) {
-            return query("UPDATE memes SET owner_address =$1 WHERE id = $2", [owner, id])
+    return contract.ownerOf(id).then(owner => {
+        const ownerLowerCase = owner.toLowerCase()
+        if (ownerLowerCase !== ownerAddressInDb) {
+            return query("UPDATE memes SET owner_address =$1 WHERE id = $2", [ownerLowerCase, id])
         }
     })
 }

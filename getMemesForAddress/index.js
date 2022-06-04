@@ -1,6 +1,5 @@
 require("dotenv").config()
 const {Pool} = require('pg')
-const {rows} = require("pg/lib/defaults");
 
 var dbConfig = {
     user: process.env.DB_USERNAME,
@@ -41,44 +40,18 @@ exports.handler = async (event, context) => {
     try {
         console.log(event)
         const queryParams = event.queryStringParameters
-        const address = queryParams.address
+        const address = queryParams.address.toLowerCase()
         console.log("Querying for address: " + address)
 
         const queryString = `
-            SELECT id, title, link, vote_up_count, vote_down_count, is_winner
+            SELECT id, title, link, vote_up_count, vote_down_count, is_winner, owner_address, competition_id
             FROM memes
             WHERE is_blocked = false
-            AND competition_id = $3
-            ORDER BY vote_result DESC 
-            OFFSET $2
+            AND owner_address = $1
         `
-        const rowsMemesPromise = query(queryString, [itemsPerPage, pagesSkip * itemsPerPage, competition])
-        const totalMemesPromise = query('SELECT COUNT(*) FROM memes WHERE is_blocked = false AND competition_id = $1', [competition])
+        const rowsMemes = (await query(queryString, [address])).rows
 
-        const rowsMemes = (await rowsMemesPromise).rows
-        const total = (await totalMemesPromise).rows[0].count
-
-        let memes = rowsMemes
-        if(address && rowsMemes.length > 0) {
-            console.log("Querying votes for address: " + address)
-            const memeIds = rowsMemes.map(_ => _.id).join(",")
-            console.log(memeIds)
-            const queryString = `SELECT meme_id, vote_up, vote_down FROM votes WHERE address = $1 AND meme_id IN (${memeIds})`
-            const votes = (await query(queryString, [address])).rows
-            console.log(votes)
-            memes = rowsMemes.map(meme => {
-                const vote = votes.filter(vote => vote.meme_id === meme.id)
-                if(vote.length > 0) {
-                    meme["votedUp"] = vote[0].vote_up
-                    meme["votedDown"] = vote[0].vote_down
-                }
-                return meme
-            })
-        }
-
-        console.log(JSON.stringify(memes))
-        console.log(total)
-        const totalPages = Math.ceil((1.0 * total) / itemsPerPage)
+        console.log(JSON.stringify(rowsMemes))
         response = {
             'statusCode': 200,
             "headers": {
@@ -87,7 +60,7 @@ exports.handler = async (event, context) => {
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "OPTIONS,GET"
             },
-            "body": JSON.stringify({memes: memes, totalPages: totalPages}),
+            "body": JSON.stringify({memes: rowsMemes}),
         }
         return response
     } catch (err) {
