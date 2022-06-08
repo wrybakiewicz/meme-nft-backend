@@ -46,53 +46,6 @@ function getContract() {
     );
 }
 
-function getTotalSupply() {
-    console.log("Querying total supply from smart contract")
-    return contract.totalSupply().then(_ => {
-        const totalSupply = _.toNumber()
-        console.log("Total supply: " + totalSupply)
-        return totalSupply
-    })
-}
-
-function getLastSavedId() {
-    console.log("Querying last saved id from DB")
-    return query("select MAX(id) from memes").then(_ => {
-        const lastSavedId = _.rows[0].max
-        console.log("Last saved id: " + lastSavedId)
-        return lastSavedId
-    })
-}
-
-function getIdsToSave(totalSupply, lastSavedId) {
-    const firstIdToFetch = lastSavedId + 1
-    const lastIdToFetch = totalSupply
-    const result = []
-    for(i = firstIdToFetch; i<=lastIdToFetch; i++) {
-        result.push(i)
-    }
-    return result
-}
-
-function fetchAndSave(id, competitionId) {
-    console.log("Fetching: " + id)
-    return contract.tokenURI(id)
-        .then(url => {
-            return query(`INSERT INTO memes VALUES (${id}, '', '${url}', 0, 0, 0, false, ${competitionId}, false, '')`)
-        })
-}
-
-function getActiveCompetitionId() {
-    return query("SELECT id from competitions WHERE now() > startdate AND now() < enddate").then(_ => {
-        console.log(_.rows);
-        if(_.rows.length == 0) {
-            return ''
-        } else {
-            return _.rows[0].id
-        }
-    })
-}
-
 async function updateOwners() {
     return query("SELECT id, owner_address FROM memes").then(_ => {
         const idOwnerAddresses = _.rows
@@ -117,30 +70,15 @@ const contract = getContract()
 
 exports.handler = async (event, context) => {
     try {
-        const totalSupplyPromise = getTotalSupply()
-        const lastSavedIdPromise = getLastSavedId()
-        const activeCompetitionIdPromise = getActiveCompetitionId()
-
-        const totalSupply = await totalSupplyPromise
-        const lastSavedId = await lastSavedIdPromise
-        let competitionId = await activeCompetitionIdPromise
-        console.log(competitionId)
-
-        if(totalSupply > lastSavedId) {
-            console.log("Updating memes in DB")
-            const idsToFetch = getIdsToSave(totalSupply, lastSavedId)
-            console.log("IDs to fetch: " + idsToFetch)
-            await Promise.all(idsToFetch.map(id => fetchAndSave(id, competitionId)))
-        } else {
-            console.log("No need to update memes in DB")
-        }
-
         await updateOwners()
 
         response = {
             'statusCode': 200,
             "headers": {
-                "Content-Type" : "application/json"
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,POST"
             },
             "body": JSON.stringify(["OK"]),
         }

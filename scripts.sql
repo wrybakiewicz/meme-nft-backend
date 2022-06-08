@@ -1,6 +1,5 @@
 CREATE TABLE memes (
     id int,
-    title text,
     link text,
     vote_up_count int,
     vote_down_count int,
@@ -8,6 +7,7 @@ CREATE TABLE memes (
     is_blocked boolean,
     competition_id int,
     is_winner boolean,
+    is_winner_minted boolean,
     owner_address text
 );
 
