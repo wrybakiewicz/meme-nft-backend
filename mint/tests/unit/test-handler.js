@@ -51,9 +51,8 @@ describe('Tests mint', function () {
                 'X-Forwarded-Port': [ '443' ],
                 'X-Forwarded-Proto': [ 'https' ]
             },
-            queryStringParameters: null,
             multiValueQueryStringParameters: null,
-            pathParameters: {
+            queryStringParameters: {
                 address: "0x26ea8aaf2028ecb261e36b61e6a21b03bd229c77"
             },
             stageVariables: null,

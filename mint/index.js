@@ -154,7 +154,7 @@ exports.handler = async (event, context) => {
 
 
         const competitionId = await getActiveCompetitionId()
-        const queryString = "INSERT INTO memes(id, link, vote_up_count, vote_down_count, vote_result, is_blocked, competition_id, is_winner, is_winner_minted, owner_address) VALUES ($1, $2, 0, 0, 0, false, $3, false, false, $4)"
+        const queryString = "INSERT INTO memes(id, link, vote_up_count, vote_down_count, vote_result, is_blocked, competition_id, is_winner, winner_id, owner_address) VALUES ($1, $2, 0, 0, 0, false, $3, false, null, $4)"
         await query(queryString, [tokenId, image, competitionId, address])
 
         response = {

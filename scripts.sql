@@ -7,7 +7,7 @@ CREATE TABLE memes (
     is_blocked boolean,
     competition_id int,
     is_winner boolean,
-    is_winner_minted boolean,
+    winner_id int,
     owner_address text
 );
 

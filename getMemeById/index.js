@@ -46,7 +46,7 @@ exports.handler = async (event, context) => {
         console.log("Querying: " + address + " id: " + id)
 
         const queryString = `
-            SELECT id, link, vote_up_count, vote_down_count, competition_id, is_winner, is_winner_minted
+            SELECT id, link, vote_up_count, vote_down_count, competition_id, is_winner, winner_id
             FROM memes
             WHERE is_blocked = false
             AND id = $1
