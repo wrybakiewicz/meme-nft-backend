@@ -104,4 +104,93 @@ describe('Tests mint', function () {
 
         expect(response).to.be.an('array');
     });
+
+    it('verify mint empty file', async () => {
+        event = {
+            resource: '/mint',
+            path: '/mint',
+            httpMethod: 'POST',
+            headers: {
+                accept: 'application/json, text/plain, */*',
+                'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7',
+                'content-type': 'multipart/form-data; boundary=----WebKitFormBoundaryANYmLYXqynOAfdQw',
+                Host: 'ibn51vomli.execute-api.eu-central-1.amazonaws.com',
+                origin: 'http://localhost:3000',
+                referer: 'http://localhost:3000/',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'cross-site',
+                'sec-gpc': '1',
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
+                'X-Amzn-Trace-Id': 'Root=1-62a1fc5b-57bc85ef697d92456be184da',
+                'X-Forwarded-For': '79.184.101.22',
+                'X-Forwarded-Port': '443',
+                'X-Forwarded-Proto': 'https'
+            },
+            multiValueHeaders: {
+                accept: [ 'application/json, text/plain, */*' ],
+                'accept-encoding': [ 'gzip, deflate, br' ],
+                'accept-language': [ 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7' ],
+                'content-type': [
+                    'multipart/form-data; boundary=----WebKitFormBoundaryANYmLYXqynOAfdQw'
+                ],
+                Host: [ 'ibn51vomli.execute-api.eu-central-1.amazonaws.com' ],
+                origin: [ 'http://localhost:3000' ],
+                referer: [ 'http://localhost:3000/' ],
+                'sec-fetch-dest': [ 'empty' ],
+                'sec-fetch-mode': [ 'cors' ],
+                'sec-fetch-site': [ 'cross-site' ],
+                'sec-gpc': [ '1' ],
+                'User-Agent': [
+                    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
+                ],
+                'X-Amzn-Trace-Id': [ 'Root=1-62a1fc5b-57bc85ef697d92456be184da' ],
+                'X-Forwarded-For': [ '79.184.101.22' ],
+                'X-Forwarded-Port': [ '443' ],
+                'X-Forwarded-Proto': [ 'https' ]
+            },
+            queryStringParameters: { address: '0x26ea8aaf2028ecb261e36b61e6a21b03bd229c77' },
+            multiValueQueryStringParameters: { address: [ '0x26ea8aaf2028ecb261e36b61e6a21b03bd229c77' ] },
+            pathParameters: null,
+            stageVariables: null,
+            requestContext: {
+                resourceId: 'hg0fn6',
+                resourcePath: '/mint',
+                httpMethod: 'POST',
+                extendedRequestId: 'TdReXG-qliAFvlg=',
+                requestTime: '09/Jun/2022:13:57:47 +0000',
+                path: '/prod/mint',
+                accountId: '966408459255',
+                protocol: 'HTTP/1.1',
+                stage: 'prod',
+                domainPrefix: 'ibn51vomli',
+                requestTimeEpoch: 1654783067729,
+                requestId: 'e7077e41-1a5f-4010-a1e9-1cadd99d1840',
+                identity: {
+                    cognitoIdentityPoolId: null,
+                    accountId: null,
+                    cognitoIdentityId: null,
+                    caller: null,
+                    sourceIp: '79.184.101.22',
+                    principalOrgId: null,
+                    accessKey: null,
+                    cognitoAuthenticationType: null,
+                    cognitoAuthenticationProvider: null,
+                    userArn: null,
+                    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36',
+                    user: null
+                },
+                domainName: 'ibn51vomli.execute-api.eu-central-1.amazonaws.com',
+                apiId: 'ibn51vomli'
+            },
+            body: '------WebKitFormBoundaryANYmLYXqynOAfdQw\r\n' +
+                'Content-Disposition: form-data; name="data"\r\n' +
+                '\r\n' +
+                'undefined\r\n' +
+                '------WebKitFormBoundaryANYmLYXqynOAfdQw--\r\n',
+            isBase64Encoded: false
+        }
+        await app.handler(event, context)
+    });
 });

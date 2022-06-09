@@ -129,11 +129,15 @@ exports.handler = async (event, context) => {
         console.log(event)
         console.log(context)
 
-        console.log(event.body.split('\r\n')[3])
-        const content = event.body.split('\r\n')[3].trim().split(",")
-
+        const content = event.body.split('\r\n')[3]
         console.log(content)
-        const memeHash = await upload(content)
+        if(content === "undefined") {
+            return
+        }
+        const contentArray = content.trim().split(",")
+
+        console.log(contentArray)
+        const memeHash = await upload(contentArray)
         const image = "https://arweave.net/" + memeHash
 
         const tokenId = await mint(address)
