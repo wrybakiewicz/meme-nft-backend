@@ -56,14 +56,14 @@ exports.handler = async (event, context) => {
         const body = JSON.parse(event.body)
         const signature = body.signature
         const params = JSON.parse(body.params)
-        const email = params.message.email
+        const email = params.message.email.toLowerCase()
         const address = recoverTypedSignature_v4({
             data: params,
             sig: signature,
         });
         console.log(address)
         console.log("Sending mail to " + email + " for address : " + address)
-        const { rows } = await query("SELECT status FROM vote_users WHERE address=$1", [address])
+        const { rows } = await query("SELECT status FROM vote_users WHERE address=$1 OR email=$2", [address, email])
         if (rows.length > 0) {
             console.log("FOUND existing email")
             return;
