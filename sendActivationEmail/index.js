@@ -77,9 +77,9 @@ exports.handler = async (event, context) => {
         await query("INSERT INTO vote_users(address, email, activation_code, status) VALUES ($1, $2, $3, 'email_sent')", [address, email, code])
 
         const sendEmailResult = await transporter.sendMail({
-            from: '"Meme NFT" <memenftss@gmail.com>',
+            from: '"MemeDegens" <memenftss@gmail.com>',
             to: email,
-            subject: "Activation code for MemeNFT",
+            subject: "Activation code for MemeDegens",
             html: `<div>Your activation code is <b>${code}</b></div>`
         }).then(info => {
             console.log("Send email result: ")
