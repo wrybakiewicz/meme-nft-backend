@@ -40,8 +40,8 @@ const initializeDbClient = async () => {
 function getContract() {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/" + process.env.RPC_KEY);
     return new ethers.Contract(
-        deploy.contracts.MemeNFTOpen.address,
-        deploy.contracts.MemeNFTOpen.abi,
+        deploy.contracts.MemeDegensOpen.address,
+        deploy.contracts.MemeDegensOpen.abi,
         provider
     );
 }

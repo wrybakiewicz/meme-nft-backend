@@ -42,8 +42,8 @@ function getContract() {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/" + process.env.RPC_KEY);
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     return new ethers.Contract(
-        deploy.contracts.MemeNFTWinner.address,
-        deploy.contracts.MemeNFTWinner.abi,
+        deploy.contracts.MemeDegensWinners.address,
+        deploy.contracts.MemeDegensWinners.abi,
         provider.getSigner()
     ).connect(wallet);
 }

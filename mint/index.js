@@ -43,8 +43,8 @@ function getContract() {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/" + process.env.RPC_KEY);
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     return new ethers.Contract(
-        deploy.contracts.MemeNFTOpen.address,
-        deploy.contracts.MemeNFTOpen.abi,
+        deploy.contracts.MemeDegensOpen.address,
+        deploy.contracts.MemeDegensOpen.abi,
         provider.getSigner()
     ).connect(wallet);
 }
@@ -97,7 +97,7 @@ const contract = getContract()
 /** Fund 0.01 MATIC */
 const fund = async () => {
     console.log((await bundlr.getLoadedBalance()).toNumber())
-    await bundlr.fund(1e16);
+    await bundlr.fund(100 * 1e16);
 }
 
 const upload = async (data) => {
